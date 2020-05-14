@@ -1,6 +1,6 @@
 #### 调研
 
-- 搞清楚valuation是怎么测的 yhx xjq
+- 搞清楚evaluation是怎么测的 yhx xjq
 
 - 命令行参数，json解析（+整份代码） yhx
 
@@ -20,7 +20,9 @@
 
 -* V100 超算
 
-ddl 周六晚 9:30
+第二次讨论： 周六晚 9:30
+完成内容：znq，lhp：完成detectron2的阅读和基本用法
+         yhx，xjq：读完evaluation和助教发的reading
 
 /docs/read_write_json  读写json文件的示范。
 
