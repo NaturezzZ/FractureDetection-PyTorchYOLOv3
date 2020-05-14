@@ -1,4 +1,10 @@
+#### 调研
 
+- detectron2
+
+- 分块辨认？
+
+- 判定之后反向找热力图？
 
 /docs/read_write_json  读写json文件的示范。
 
