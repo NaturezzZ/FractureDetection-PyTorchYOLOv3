@@ -6,6 +6,8 @@
 
 - detectron2 znq lhp yhx https://github.com/facebookresearch/detectron2
 
+- 看看有没有新的论文/能用的代码 lhp
+
 - tensorflow https://github.com/jiangyy5318/medical-rib 
 
 - resnet unet imagenet
