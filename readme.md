@@ -20,11 +20,17 @@
 
 V100 超算
 
-第二次讨论： 周六晚 9:30
-完成内容：znq，lhp：完成detectron2的阅读和基本用法
-         yhx，xjq：读完evaluation和助教发的reading
+#### 讨论记录
 
+- 第二次讨论： 2020/5/16 周六晚 21:30
 
+完成内容：znq，lhp：完成detectron2的阅读和基本用法；yhx，xjq：读完evaluation和助教发的reading
+
+讨论内容：evaluation的细节，precision和recall两个评测指标，AP能否反向传播是个问题。detectron2的输入、输出数据格式，网络架构，基本用法。暂时认为只用detectron2得不到较好的效果（不收敛警告）
+  
+- 第三次讨论：2020/5/19 周二晚 20:30
+
+完成内容：xjq，lhp：做出来可运行的用detectron2看一下效果；yhx，znq：做rcnn
 
 #### 已完成
 
