@@ -1,6 +1,6 @@
 ## Evaluation Metrics
 
-Ref. 
+Ref.
 
 Explanation: https://github.com/rafaelpadilla/Object-Detection-Metrics
 
