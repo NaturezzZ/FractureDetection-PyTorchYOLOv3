@@ -2,17 +2,19 @@
 
 Ref.
 
-[1]: https://github.com/rafaelpadilla/Object-Detection-Metrics	"Explanation"
-[2]: http://cocodataset.org/#detection-eval	"Coco evaluation metrics"
-[3]: https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb	"Coco evaluation API"
+Explanation: https://github.com/rafaelpadilla/Object-Detection-Metrics
 
+Coco evaluation metrics: http://cocodataset.org/#detection-eval
 
+Coco evaluation API: https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocoEvalDemo.ipynb
 
 ### Definitions
 
 #### Intersection over Union (IoU)
 
 Jaccard Index that evaluates the overlap between two bounding boxes.
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=\text{IoU}&space;=\frac{\text{area}(B_p\cap&space;B_{gt})}{\text{area}(B_p\cup&space;B_{gt})}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\text{IoU}&space;=\frac{\text{area}(B_p\cap&space;B_{gt})}{\text{area}(B_p\cup&space;B_{gt})}" title="\text{IoU} =\frac{\text{area}(B_p\cap B_{gt})}{\text{area}(B_p\cup B_{gt})}" /></a>
 $$
 \text{IoU} =\frac{\text{area}(B_p\cap B_{gt})}{\text{area}(B_p\cup B_{gt})}
 $$
@@ -21,6 +23,8 @@ Threshold: Usually set to 50%, 75%, 95%.
 #### Precision
 
 The ability to identify **only** the relevant objects.
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=Precision&space;=&space;\frac{\text{True&space;Positive}}{\text{all&space;detections}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Precision&space;=&space;\frac{\text{True&space;Positive}}{\text{all&space;detections}}" title="Precision = \frac{\text{True Positive}}{\text{all detections}}" /></a>
 $$
 Precision = \frac{\text{True Positive}}{\text{all detections}}
 $$
@@ -28,6 +32,8 @@ $$
 #### Recall
 
 The ability to find **all** the relevant cases(all the ground truth).
+
+<a href="https://www.codecogs.com/eqnedit.php?latex=Recall&space;=&space;\frac{\text{True&space;Positive}}{\text{all&space;ground&space;truths}}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?Recall&space;=&space;\frac{\text{True&space;Positive}}{\text{all&space;ground&space;truths}}" title="Recall = \frac{\text{True Positive}}{\text{all ground truths}}" /></a>
 $$
 Recall = \frac{\text{True Positive}}{\text{all ground truths}}
 $$
@@ -37,11 +43,11 @@ $$
 
 #### Average Precision (AP)
 
+<a href="https://www.codecogs.com/eqnedit.php?latex=AP&space;=&space;\sum_{r=0}^{1}\left(r_{n&plus;1}-r_{n}\right)&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right),\\&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right)&space;=&space;\max_{\tilde{r}:\tilde{r}\ge&space;r_{n&plus;1}}\rho(\tilde{r})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?AP&space;=&space;\sum_{r=0}^{1}\left(r_{n&plus;1}-r_{n}\right)&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right),\\&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right)&space;=&space;\max_{\tilde{r}:\tilde{r}\ge&space;r_{n&plus;1}}\rho(\tilde{r})" title="AP = \sum_{r=0}^{1}\left(r_{n+1}-r_{n}\right) \rho_{i n t e r p}\left(r_{n+1}\right),\\ \rho_{i n t e r p}\left(r_{n+1}\right) = \max_{\tilde{r}:\tilde{r}\ge r_{n+1}}\rho(\tilde{r})" /></a>
 $$
 AP = \sum_{r=0}^{1}\left(r_{n+1}-r_{n}\right) \rho_{i n t e r p}\left(r_{n+1}\right),\\
 \rho_{i n t e r p}\left(r_{n+1}\right) = \max_{\tilde{r}:\tilde{r}\ge r_{n+1}}\rho(\tilde{r})
 $$
-
 Here, $\sum_{r=0}^1$ means interpolating through all points from 0 to 1. We take the precision of $r_{n+1}$ the maximum precision whose **recall value** is greater or equal than $r_{n+1}$.
 
 #### Metrics for COCO
