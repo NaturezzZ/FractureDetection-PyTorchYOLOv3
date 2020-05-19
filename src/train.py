@@ -8,13 +8,13 @@ from model import CNN_Net
 from test import test
 
 # loading training data
-train_data = FractionDataset(train_data_dir)
+train_data = FractionDataset(train_img_dir, train_json_dir)
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=0)
 print("Loading training data: Success.")
 time.sleep(0.5)
 
 # loading test data
-test_data = FractionDataset(test_data_dir)
+test_data = FractionDataset(test_img_dir, test_json_dir)
 train_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True, num_workers=0)
 print("Loading validation data: Success.")
 time.sleep(0.5)

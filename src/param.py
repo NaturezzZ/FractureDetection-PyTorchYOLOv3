@@ -3,8 +3,10 @@ import os
 import torch
 
 parser = argparse.ArgumentParser(description='Run commands')
-parser.add_argument("--train_data_dir", default="../data/fracture/annotations/anno_train.json", type=str)
-parser.add_argument("--test_data_dir", default="../data/fracture/annotations/anno_val.json", type=str)
+parser.add_argument("--train_img_dir", default="../data/fracture/train/", type=str)
+parser.add_argument("--test_img_dir", default="../data/fracture/val/", type=str)
+parser.add_argument("--train_json_dir", default="../data/fracture/annotations/anno_train.json", type=str)
+parser.add_argument("--test_json_dir", default="../data/fracture/annotations/anno_val.json", type=str)
 # parser.add_argument("--data_dir", default="", type=str)
 # parser.add_argument("--anno_path", default="", type=str)
 # parser.add_argument("--output_path", default="", type=str)
@@ -19,8 +21,10 @@ if arg.device == "cpu":
 else:
 	device = torch.device("cuda:0")
 
-train_data_dir = arg.train_data_dir
-test_data_dir = arg.test_data_dir
+train_img_dir = arg.train_img_dir
+test_img_dir = arg.test_img_dir
+train_json_dir = arg.train_json_dir
+test_json_dir = arg.test_json_dir
 # data_dir = arg.data_dir
 # anno_path = arg.anno_path
 # output_path = arg.output_path
