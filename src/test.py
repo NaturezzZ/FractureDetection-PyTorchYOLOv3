@@ -1,3 +1,9 @@
+import torch.nn as nn
+
+def test(outputs, labels):
+    nn.CrossEntropyLoss(outputs, labels)
+
+'''
 # matplotlib inline
 import matplotlib.pyplot as plt
 from pycocotools.coco import COCO
@@ -24,6 +30,7 @@ cocoEval.params.imgIds = imgIds
 cocoEval.evaluate()
 cocoEval.accumulate()
 cocoEval.summarize()
+'''
 
 '''
 the output is supposed to be:

@@ -1,6 +1,6 @@
 ## Evaluation Metrics
 
-Ref.
+Ref. 
 
 Explanation: https://github.com/rafaelpadilla/Object-Detection-Metrics
 
@@ -38,7 +38,7 @@ The ability to find **all** the relevant cases(all the ground truth).
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=AP&space;=&space;\sum_{r=0}^{1}\left(r_{n&plus;1}-r_{n}\right)&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right),\\&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right)&space;=&space;\max_{\tilde{r}:\tilde{r}\ge&space;r_{n&plus;1}}\rho(\tilde{r})" target="_blank"><img src="https://latex.codecogs.com/gif.latex?AP&space;=&space;\sum_{r=0}^{1}\left(r_{n&plus;1}-r_{n}\right)&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right),\\&space;\rho_{i&space;n&space;t&space;e&space;r&space;p}\left(r_{n&plus;1}\right)&space;=&space;\max_{\tilde{r}:\tilde{r}\ge&space;r_{n&plus;1}}\rho(\tilde{r})" title="AP = \sum_{r=0}^{1}\left(r_{n+1}-r_{n}\right) \rho_{i n t e r p}\left(r_{n+1}\right),\\ \rho_{i n t e r p}\left(r_{n+1}\right) = \max_{\tilde{r}:\tilde{r}\ge r_{n+1}}\rho(\tilde{r})" /></a>
 
-Here, <a href="https://www.codecogs.com/eqnedit.php?latex=\sum_{r=0}^1" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\sum_{r=0}^1" title="\sum_{r=0}^1" /></a> means interpolating through all points from 0 to 1. We take the precision of <a href="https://www.codecogs.com/eqnedit.php?latex=r_{n&plus;1}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?r_{n&plus;1}" title="r_{n+1}" /></a> the maximum precision whose **recall value** is greater or equal than <a href="https://www.codecogs.com/eqnedit.php?latex=r_{n&plus;1}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?r_{n&plus;1}" title="r_{n+1}" /></a>.
+Here, `r` is interpolated through all points from 0 to 1. We let the average precision be the maximum precision whose **recall value** is greater or equal than `r`.
 
 #### Metrics for COCO
 
