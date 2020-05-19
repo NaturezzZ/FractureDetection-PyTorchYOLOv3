@@ -12,6 +12,7 @@ parser.add_argument("--test_json_dir", default="../data/fracture/annotations/ann
 # parser.add_argument("--output_path", default="", type=str)
 parser.add_argument("--model_path", default="models/", type=str)
 parser.add_argument("--epochs", default=10, type=int)
+parser.add_argument("--device", default="cuda:0", type=str)
 parser.add_argument("--learning_rate", default=1e-3, type=float)
 parser.add_argument("--batch_size", default=32, type=int)
 
