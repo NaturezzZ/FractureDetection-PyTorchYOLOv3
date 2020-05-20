@@ -1,29 +1,16 @@
 """
-
 （一）本代码中所有传递的信息的格式均为：
-
 {"image": image, "bbox": bbox}
-
 这是某一个 bbox 和它对应的图片（注意多个 bbox 可能对应同一个图片）
-
 1. 其中的 image 是 ndarray (numpy 读取的图片) 的格式，相当于 Height*Weight*Channel 的三维数组。
-
 注意是顺序是 Height*Weight*Channel，也就是 y*x*channel
-
 如果用了 ToTensor 把 image 转换为 Tensor，则会转换为 torch 包的 C*H*W 格式
-
 2. bbox 是 np.array([x, y, weight, height]) 的格式
-
 （二）以下类可以当做函数来使用：
-
 Rescale()  更改大小
-
 Crop()  剪裁（随机/只提取bbox）
-
 ToTensor()  把 ndarray 转换为 Tensor
-
 （三）本文中自己指定的 output_size 都是 tuple 格式，应为 (weight, height)
-
 """
 
 from __future__ import print_function, division
@@ -178,12 +165,10 @@ class Rescale(object):
 class Crop(object):
     """
     随机裁剪样本中的图像
-
     Args:
         output_size (tuple)：所需的输出大小。=(width, height)
        
         type (str): "Random" or "BBox_only"
-
         if type == BBox_only, the bbox image will be rescaled to output_size
     """
 

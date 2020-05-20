@@ -1,36 +1,16 @@
-#### 调研
+#### 最新消息
 
-- 搞清楚evaluation是怎么测的 yhx xjq
+dataloader 已经基本完工。
 
-- 命令行参数，json解析（+整份代码） yhx
+test data比较小，加载不到10s，完全加载的话内存大概为2G不到，可以在自己电脑上测试。
 
-- detectron2 znq lhp yhx https://github.com/facebookresearch/detectron2
+training data约为test data的10倍大小，加载大概1min多一点，完全加载的整个过程内存最大开销大概为16G，建议在服务器上测试
 
-- 看看有没有新的论文/能用的代码 lhp
+（我也不知道为什么1G的图片加载进内存就变成16G了，不过问题也不大就是了都能放得下）
 
-- tensorflow https://github.com/jiangyy5318/medical-rib 
+这份代码的数据都是预处理好的（包括一直到转换为tensor的步骤，从FractionDataSet读取出来直接就是tensor了），读取是比较快的（不需要边读取边transform）
 
-- resnet unet imagenet
 
-- pytorch znq
-
-- 分块辨认？
-
-- 判定之后反向找热力图？
-
-~~V100 超算~~
-
-#### 讨论记录
-
-- 第二次讨论： 2020/5/16 周六晚 21:30
-
-完成内容：znq，lhp：完成detectron2的阅读和基本用法；yhx，xjq：读完evaluation和助教发的reading
-
-讨论内容：evaluation的细节，precision和recall两个评测指标，AP能否反向传播是个问题。detectron2的输入、输出数据格式，网络架构，基本用法。暂时认为只用detectron2得不到较好的效果（不收敛警告）
-
-- 第三次讨论：2020/5/19 周二晚 20:30
-
-完成内容：xjq，lhp：做出来可运行的用detectron2看一下效果；yhx，znq：做rcnn
 
 #### 已完成
 
@@ -58,3 +38,32 @@
 
 
 
+
+
+#### 调研
+
+- detectron2 znq lhp yhx https://github.com/facebookresearch/detectron2
+
+- 看看有没有新的论文/能用的代码 lhp
+
+- tensorflow https://github.com/jiangyy5318/medical-rib 
+
+- resnet unet imagenet
+
+- 分块辨认？
+
+- 判定之后反向找热力图？
+
+
+
+#### 讨论记录
+
+- 第二次讨论： 2020/5/16 周六晚 21:30
+
+完成内容：znq，lhp：完成detectron2的阅读和基本用法；yhx，xjq：读完evaluation和助教发的reading
+
+讨论内容：evaluation的细节，precision和recall两个评测指标，AP能否反向传播是个问题。detectron2的输入、输出数据格式，网络架构，基本用法。暂时认为只用detectron2得不到较好的效果（不收敛警告）
+
+- 第三次讨论：2020/5/19 周二晚 20:30
+
+完成内容：xjq，lhp：做出来可运行的用detectron2看一下效果；yhx，znq：做rcnn
