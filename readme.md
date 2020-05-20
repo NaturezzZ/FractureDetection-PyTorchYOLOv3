@@ -18,7 +18,7 @@
 
 - 判定之后反向找热力图？
 
-V100 超算
+~~V100 超算~~
 
 #### 讨论记录
 
@@ -42,17 +42,19 @@ V100 超算
 
 /docs/evaluation_info.md    测试方式（evaluation，AP50）的说明
 
+/src/param.py    处理命令行参数的代码
+
+/src/dataloader.py     处理数据、产生dataloader的代码
+
+/src/model.py     一个朴实无华的CNN
+
 
 
 以下代码仍在调试中
 
 /src/train.py    主代码
 
-/src/param.py    处理命令行参数的代码
-
 /src/test.py    接口尚未完工的evaluation代码（暂时替换为直接计算CrossEntropy）
 
-/src/dataloader.py     处理数据、产生dataloader的代码
 
-/src/model.py     一个朴实无华的CNN
 

@@ -1,3 +1,31 @@
+"""
+
+（一）本代码中所有传递的信息的格式均为：
+
+{"image": image, "bbox": bbox}
+
+这是某一个 bbox 和它对应的图片（注意多个 bbox 可能对应同一个图片）
+
+1. 其中的 image 是 ndarray (numpy 读取的图片) 的格式，相当于 Height*Weight*Channel 的三维数组。
+
+注意是顺序是 Height*Weight*Channel，也就是 y*x*channel
+
+如果用了 ToTensor 把 image 转换为 Tensor，则会转换为 torch 包的 C*H*W 格式
+
+2. bbox 是 np.array([x, y, weight, height]) 的格式
+
+（二）以下类可以当做函数来使用：
+
+Rescale()  更改大小
+
+Crop()  剪裁（随机/只提取bbox）
+
+ToTensor()  把 ndarray 转换为 Tensor
+
+（三）本文中自己指定的 output_size 都是 tuple 格式，应为 (weight, height)
+
+"""
+
 from __future__ import print_function, division
 import os
 import cv2
@@ -18,6 +46,10 @@ warnings.filterwarnings("ignore")
 def show_box(image, bbox):
     """
     显示带有黄色 bbox 的图片
+    
+    参数 image 应为 H*W*C 的 numpy 格式
+    
+    参数 bbox 应为 np.array([1, 2, 3, 4]) 格式
     """
     plt.figure()
     plt.imshow(image)
@@ -94,14 +126,17 @@ class FractionDataset(Dataset):
             print("Successfully load image file from " + img_dir)
         
         # print the last image to check the correctness
-
+        
+        self.cache_sample = []
+        for fraction_id in range(self.num_of_fractures):
+            imgid = self.belong_to_image_id[fraction_id]
+            idx = self.id2index[imgid]
+            sample = {'image': self.image[idx], 'bbox': np.array(self.bbox[fraction_id])}
+            if self.transform:
+                sample = self.transform(sample)
+            self.cache_sample.append(sample)
         if verbose:
-            for fraction_id in range(3):
-            # fraction_id = num_of_fractures - 1
-                imgid = self.belong_to_image_id[fraction_id]
-                idx = self.id2index[imgid]
-                print(idx)
-                show_box(self.image[idx], self.bbox[fraction_id])
+            print("Successfully cache images ")
 
     # define len(FractionDataset)
     def __len__(self):
@@ -110,19 +145,14 @@ class FractionDataset(Dataset):
     # define FractionDataset[idx]
     # note: return the ith bbox and its corresponding image
     def __getitem__(self, fraction_id):
-        imgid = self.belong_to_image_id[fraction_id]
-        idx = self.id2index[imgid]
-        sample = {'image': self.image[idx], 'bbox': np.array(self.bbox[fraction_id])}
-        if self.transform:
-            sample = self.transform(sample)
-        return sample
+        return self.cache_sample[fraction_id]
 
 class Rescale(object):
     """
     将样本中的图像重新缩放到给定大小。
     
     Args:
-        output_size (tuple)：所需的输出大小。
+        output_size (tuple)：所需的输出大小。 =(width, height)
     """
 
     def __init__(self, output_size):
@@ -135,7 +165,7 @@ class Rescale(object):
         # numpy包的图片是: H * W * C
         # torch包的图片是: C * H * W
         h, w = image.shape[:2]
-        new_h, new_w = self.output_size
+        new_w, new_h = self.output_size
         img = transform.resize(image, (new_h, new_w))
         if bbox[0] != -1: # if the box exists
             bbox[0] = round(float(bbox[0]) * new_w / w)
@@ -150,7 +180,7 @@ class Crop(object):
     随机裁剪样本中的图像
 
     Args:
-        output_size (tuple)：所需的输出大小。
+        output_size (tuple)：所需的输出大小。=(width, height)
        
         type (str): "Random" or "BBox_only"
 
@@ -185,13 +215,16 @@ class Crop(object):
             if bbox[0] == -1:
                 return res(sample)
             x, y, w, h = bbox[0], bbox[1], bbox[2], bbox[3]
-            image = image[x: x + w, y: y + h]
-            result = {'image': image, 'bbox': np.array([0, 0, w, h])}
+            image = image[y: y + h, x: x + w, :]
+            bbox = np.array([0, 0, w, h])
+            result = {'image': image, 'bbox': bbox}
             result = res(result)
             return result
 
 class ToTensor(object):
-    """ 将样本中的 ndarrays 转换为 Tensors"""
+    """
+    将样本中的 ndarrays 转换为 Tensors
+    """
     def __call__(self, sample):
         image, bbox = sample['image'], sample['bbox']
         # 交换颜色轴，因为
@@ -204,27 +237,25 @@ class ToTensor(object):
 if __name__ == "__main__":
     img_dir = '../data/fracture/val/'
     json_dir = '../data/fracture/annotations/anno_val.json'
-    
-    # test the correctness of FractionDataset class
-    print("Start Teststing 1")
-    data = FractionDataset(img_dir, json_dir, verbose = True) # verbose
 
-    # test the correctness of transform
-    print("Start Teststing 2")
+    # test the correctness of FractionDataset class and the transform functions
+    print("Start Testing")
     transformed_dataset = FractionDataset(img_dir, json_dir,
                                            verbose = False, # silent, not verbose
                                            transform = transforms.Compose([
-                                               Rescale((512, 512)),
-                                               Crop((400, 400), pattern = "BBox_only"),
+                                               # Rescale((512, 512)),
+                                               Crop((512, 512), pattern = "BBox_only"),
                                                ToTensor()
                                            ]))
-    
     print("Loading ended")
+
+    # 设定调试的时候输出几张图片
+    output_number = 5
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
         print(i, sample['image'].size(), sample['bbox'].size())
         show_box(sample['image'].numpy().transpose((1, 2, 0)), sample['bbox'].numpy())
-        if i == 2:
+        if i == output_number - 1:
             break
 
 '''
