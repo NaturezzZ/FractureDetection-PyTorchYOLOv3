@@ -64,6 +64,14 @@ training data约为test data的10倍大小，加载大概1min多一点，完全�
 
 讨论内容：evaluation的细节，precision和recall两个评测指标，AP能否反向传播是个问题。detectron2的输入、输出数据格式，网络架构，基本用法。暂时认为只用detectron2得不到较好的效果（不收敛警告）
 
-- 第三次讨论：2020/5/19 周二晚 20:30
+- 第三次讨论：2020/5/20 周三晚 21:00
 
 完成内容：xjq，lhp：做出来可运行的用detectron2看一下效果；yhx，znq：做rcnn
+
+- 第四次讨论：2020/5/23 周六下午 3:00
+
+yhx: evaluation api, dataloader change
+
+znq, lhp: yolo api
+
+xjq: detectron2 api
