@@ -62,6 +62,15 @@ def check_bbox(new_w, new_h, bbox):
         return np.array([-1, -1, -1, -1])
     return bbox
 
+def calc(sample):
+    h = sample['bbox'][2]
+    w = sample['bbox'][3]
+    s1 = w * h
+    h = sample['image'].shape[1]
+    w = sample['image'].shape[2]
+    s2 = w * h
+    return np.array(float(s1) / s2)
+
 class FractionDataset(Dataset):
     """
     把每个骨折转换为可以被 Dataloader 读取的 iterable 格式
@@ -121,6 +130,7 @@ class FractionDataset(Dataset):
             sample = {'image': self.image[idx], 'bbox': np.array(self.bbox[fraction_id])}
             if self.transform:
                 sample = self.transform(sample)
+            sample['label'] = torch.from_numpy(calc(sample))
             self.cache_sample.append(sample)
         if verbose:
             print("Successfully cache images ")
@@ -217,7 +227,8 @@ class ToTensor(object):
         # torch 包的图片是: C * H * W
         image = image.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image),
-                'bbox': torch.from_numpy(bbox)}
+                'bbox': torch.from_numpy(bbox)
+                }
 
 if __name__ == "__main__":
     img_dir = '../data/fracture/val/'
@@ -228,8 +239,8 @@ if __name__ == "__main__":
     transformed_dataset = FractionDataset(img_dir, json_dir,
                                            verbose = False, # silent, not verbose
                                            transform = transforms.Compose([
-                                               # Rescale((512, 512)),
-                                               Crop((512, 512), pattern = "BBox_only"),
+                                               Rescale((1024, 1024)),
+                                               Crop((512, 512), pattern = "Random"),
                                                ToTensor()
                                            ]))
     print("Loading ended")
@@ -238,7 +249,7 @@ if __name__ == "__main__":
     output_number = 5
     for i in range(len(transformed_dataset)):
         sample = transformed_dataset[i]
-        print(i, sample['image'].size(), sample['bbox'].size())
+        print(i, sample['image'].size(), sample['bbox'].size(), sample['label'])
         show_box(sample['image'].numpy().transpose((1, 2, 0)), sample['bbox'].numpy())
         if i == output_number - 1:
             break
