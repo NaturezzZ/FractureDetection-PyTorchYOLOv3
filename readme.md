@@ -22,11 +22,19 @@ training data约为test data的10倍大小，加载大概1min多一点，完全�
 
 /docs/evaluation_info.md    测试方式（evaluation，AP50）的说明
 
+/docs/evaluation_metrics_definition.md    测试方式的数学定义说明
+
+/docs/Detectron2_Usage.md    Detectron2在json格式的COCO数据集上的使用说明，以及detectron2相关资源的网址
+
 /src/param.py    处理命令行参数的代码
 
 /src/dataloader.py     处理数据、产生dataloader的代码
 
 /src/model.py     一个朴实无华的CNN
+
+/src/d2trial.py, /src/d2test.py     detectron2方法，GPU问题尚待解决
+
+
 
 
 
