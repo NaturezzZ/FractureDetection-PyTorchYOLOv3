@@ -7,7 +7,12 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 
+def resize(image, size):
+    image = F.interpolate(image.unsqueeze(0), size=size, mode="nearest").squeeze(0)
+    return image
+
 from utils.augmentations import horisontal_flip
+from utils.augmentations import crop
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
@@ -25,9 +30,7 @@ def pad_to_square(img, pad_value):
     return img, pad
 
 
-def resize(image, size):
-    image = F.interpolate(image.unsqueeze(0), size=size, mode="nearest").squeeze(0)
-    return image
+
 
 
 def random_resize(images, min_size=288, max_size=448):
@@ -37,7 +40,7 @@ def random_resize(images, min_size=288, max_size=448):
 
 
 class ImageFolder(Dataset):
-    def __init__(self, folder_path, img_size=416):
+    def __init__(self, folder_path, img_size=512):
         self.files = sorted(glob.glob("%s/*.*" % folder_path))
         self.img_size = img_size
 
@@ -57,10 +60,10 @@ class ImageFolder(Dataset):
 
 
 class ListDataset(Dataset):
-    def __init__(self, list_path, img_size=416, augment=True, multiscale=True, normalized_labels=True):
+    def __init__(self, list_path, img_size=512, augment=True, multiscale=True, normalized_labels=True, crop=True):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
-
+        
         self.label_files = [
             path.replace("images", "labels").replace(".png", ".txt").replace(".jpg", ".txt")
             for path in self.img_files
@@ -69,6 +72,7 @@ class ListDataset(Dataset):
         self.max_objects = 100
         self.augment = augment
         self.multiscale = multiscale
+        self.crop = crop
         self.normalized_labels = normalized_labels
         self.min_size = self.img_size - 3 * 32
         self.max_size = self.img_size + 3 * 32
@@ -123,8 +127,10 @@ class ListDataset(Dataset):
 
             targets = torch.zeros((len(boxes), 6))
             targets[:, 1:] = boxes
-
+        #print(targets)
         # Apply augmentations
+        img, targets = crop(img, targets)
+        
         if self.augment:
             if np.random.random() < 0.5:
                 img, targets = horisontal_flip(img, targets)

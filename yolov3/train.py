@@ -35,7 +35,7 @@ if __name__ == "__main__":
     parser.add_argument("--checkpoint_interval", type=int, default=10, help="interval between saving model weights")
     parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=False, help="if True computes mAP every tenth batch")
-    parser.add_argument("--multiscale_training", default=True, help="allow for multi-scale training")
+    parser.add_argument("--multiscale_training", default=False, help="allow for multi-scale training")
     opt = parser.parse_args()
     print(opt)
 
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     print('Model {} : params: {:4f}M'.format(model._get_name(), para * 4 / 1000 / 1000))
 
     # Get dataloader
-    dataset = ListDataset(train_path, augment=True, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, augment=True, crop=True, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
