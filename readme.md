@@ -83,3 +83,9 @@ yhx: evaluation api, dataloader change
 znq, lhp: yolo api
 
 xjq: detectron2 api
+
+讨论结果：继续使用znq的算法进行进一步工作。
+
+任务：xjq继续对数据进行预处理 znq yhx研究AP、做实验 lhp研究yolo v3
+
+- 第五次讨论：2020/5/25 周一晚 20:30
