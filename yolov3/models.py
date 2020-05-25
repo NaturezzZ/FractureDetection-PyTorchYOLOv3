@@ -188,7 +188,8 @@ class YOLOLayer(nn.Module):
                 anchors=self.scaled_anchors,
                 ignore_thres=self.ignore_thres,
             )
-
+            obj_mask = obj_mask.bool()
+            noobj_mask = noobj_mask.bool()
             # Loss : Mask outputs to ignore non-existing objects (except with conf. loss)
             loss_x = self.mse_loss(x[obj_mask], tx[obj_mask])
             loss_y = self.mse_loss(y[obj_mask], ty[obj_mask])

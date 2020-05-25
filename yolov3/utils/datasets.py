@@ -60,7 +60,7 @@ class ImageFolder(Dataset):
 
 
 class ListDataset(Dataset):
-    def __init__(self, list_path, img_size=512, augment=True, multiscale=True, normalized_labels=True, crop=True):
+    def __init__(self, list_path, img_size=512, augment=True, multiscale=True, normalized_labels=True, crop_prob=True):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
         
@@ -72,7 +72,7 @@ class ListDataset(Dataset):
         self.max_objects = 100
         self.augment = augment
         self.multiscale = multiscale
-        self.crop = crop
+        self.crop_prob = crop_prob
         self.normalized_labels = normalized_labels
         self.min_size = self.img_size - 3 * 32
         self.max_size = self.img_size + 3 * 32
@@ -108,8 +108,12 @@ class ListDataset(Dataset):
 
         targets = None
         if os.path.exists(label_path):
-            boxes = torch.from_numpy(np.loadtxt(label_path).reshape(-1, 5))
+            boxes = np.loadtxt(label_path).reshape(-1, 5)
+            boxes.astype(np.double)
+            #print(np.loadtxt(label_path).reshape(-1, 5).dtype)
+            boxes = torch.from_numpy(boxes)
             # Extract coordinates for unpadded + unscaled image
+            #print(boxes.type)
             x1 = w_factor * (boxes[:, 1] - boxes[:, 3] / 2)
             y1 = h_factor * (boxes[:, 2] - boxes[:, 4] / 2)
             x2 = w_factor * (boxes[:, 1] + boxes[:, 3] / 2)
@@ -127,10 +131,12 @@ class ListDataset(Dataset):
 
             targets = torch.zeros((len(boxes), 6))
             targets[:, 1:] = boxes
-        #print(targets)
         # Apply augmentations
-        img, targets = crop(img, targets)
         
+        if np.random.uniform() < self.crop_prob:
+            img, targets = crop(img, targets)
+        targets = targets.type(torch.FloatTensor)
+
         if self.augment:
             if np.random.random() < 0.5:
                 img, targets = horisontal_flip(img, targets)

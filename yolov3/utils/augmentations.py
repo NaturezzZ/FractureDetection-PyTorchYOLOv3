@@ -2,17 +2,21 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 from utils.datasets import resize
-
+import os
+import pdb
 def horisontal_flip(images, targets):
     images = torch.flip(images, [-1])
     targets[:, 2] = 1 - targets[:, 2]
     return images, targets
 
 def crop(images, targets):
-    x = targets[:, 2]
-    y = targets[:, 3]
-    w = targets[:, 4]
-    h = targets[:, 5]
+    #print(images)
+    #print(targets)
+    x = targets[0, 2]
+    y = targets[0, 3]
+    w = targets[0, 4]
+    h = targets[0, 5]
+    #print((x,y,w,h))
     _, h_factor, w_factor = images.shape
     
     x1 = x - w/2
@@ -36,16 +40,26 @@ def crop(images, targets):
     ty2 = int(y2_p)
     tx1 = int(x1_p)
     tx2 = int(x2_p)
-    
+    #print((ty1,ty2,tx1,tx2))
     new_image = images[:, ty1:ty2, tx1:tx2]
     #new_image = images[:, :int(y2_p), :]
     #new_image = new_image[:,:,int(x1_p):int(x2_p)]
     new_image = resize(new_image, (512,512))
     images = new_image
 
-    targets[:, 2] = (x-nx1)/nw
-    targets[:, 3] = (y-ny1)/nh
-    targets[:, 4] = w/nw
-    targets[:, 5] = h/nh
+    result_tar = np.zeros((1,6))
+    result_tar[0, 1] = targets[0, 1]
+    result_tar[0, 2] = (x-nx1)/nw
+    result_tar[0, 3] = (y-ny1)/nh
+    result_tar[0, 4] = w/nw
+    result_tar[0, 5] = h/nh
+    #print(result_tar)
+    result_tar.astype(np.double)
+    result_tar = torch.from_numpy(result_tar)
 
+    targets = result_tar
+    #print('*******')
+    #print(np.shape(images))
+    #print(np.shape(targets))
+    #print(targets.dtype)
     return images, targets

@@ -21,21 +21,34 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 import torch.optim as optim
+import warnings
+import traceback
+import sys
+
+def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+
+    log = file if hasattr(file,'write') else sys.stderr
+    traceback.print_stack(file=log)
+    log.write(warnings.formatwarning(message, category, filename, lineno, line))
 
 if __name__ == "__main__":
+    warnings.showwarning = warn_with_traceback
+
+    warnings.filterwarnings('ignore')
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=100, help="number of epochs")
     parser.add_argument("--batch_size", type=int, default=8, help="size of each image batch")
     parser.add_argument("--gradient_accumulations", type=int, default=2, help="number of gradient accums before step")
     parser.add_argument("--model_def", type=str, default="config/yolov3-custom.cfg", help="path to model definition file")
     parser.add_argument("--data_config", type=str, default="config/custom.data", help="path to data config file")
-    parser.add_argument("--pretrained_weights", type=str, help="if specified starts from checkpoint model")
-    parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
+    parser.add_argument("--pretrained_weights", type=str, default = "checkpoints/yolov3_ckpt_final.pth", help="if specified starts from checkpoint model")
+    parser.add_argument("--n_cpu", type=int, default=12, help="number of cpu threads to use during batch generation")
     parser.add_argument("--img_size", type=int, default=512, help="size of each image dimension")
     parser.add_argument("--checkpoint_interval", type=int, default=10, help="interval between saving model weights")
     parser.add_argument("--evaluation_interval", type=int, default=1, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=True, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=False, help="allow for multi-scale training")
+    parser.add_argument("--crop_probility", type=float, default= 0.5, help = "probility to crop the picture like a microscope")
     opt = parser.parse_args()
     print(opt)
 
@@ -68,7 +81,7 @@ if __name__ == "__main__":
     print('Model {} : params: {:4f}M'.format(model._get_name(), para * 4 / 1000 / 1000))
 
     # Get dataloader
-    dataset = ListDataset(train_path, augment=True, crop=True, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, augment=True, crop_prob=opt.crop_probility, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
@@ -179,4 +192,5 @@ if __name__ == "__main__":
             print(f"---- mAP {AP.mean()}")
 
         if epoch % opt.checkpoint_interval == 0:
-            torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % (epoch+51))
+            torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % (epoch+1))
+    torch.save(model.state_dict(), "checkpoints/yolov3_ckpt_final.pth")

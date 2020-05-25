@@ -11,3 +11,4 @@ backup
 weights/*.weights
 __pycache__
 checkpoints
+data/custom/images1
