@@ -144,6 +144,42 @@ class FractionDataset(Dataset):
     def __getitem__(self, fraction_id):
         return self.cache_sample[fraction_id]
 
+class Con_Bright(object):
+    """
+    调整样本图像的对比度、亮度
+
+    Args:
+        alpha：对比度系数
+        beta：亮度系数
+
+    Args note:
+        (1) a=1时是原图；
+        (2) a>1时对比度增强，图像看起来更加清晰；
+        (3) a<1时对比度减弱，图像看起来变暗；
+        (4) b影响图像的亮度，随着增加b (b>0)和减小b (b>0)，图像整体的灰度值上移或者下移, 图像整体变亮或者变暗, 不改变图像的对比度
+    """
+
+    def __init__(self, alpha, beta):
+        self.alpha = alpha
+        self.beta = beta
+
+    def __call__(self, sample):
+        image, bbox = sample['image'], sample['bbox']
+        new_image = cv2.convertScaleAbs(image * 255, alpha=self.alpha, beta=self.beta)
+        return {'image': new_image, 'bbox': bbox}
+
+class Sharpen(object):
+    def __init__(self):
+        self.kernel = np.array([[-1,-1,-1],
+                                [-1, 9,-1],
+                                [-1,-1,-1]])
+
+    def __call__(self, sample):
+        image, bbox = sample['image'], sample['bbox']
+        sharpened = cv2.filter2D(image, -1,
+                                 self.kernel)
+        return {'image': sharpened, 'bbox': bbox}
+
 class Rescale(object):
     """
     将样本中的图像重新缩放到给定大小。
@@ -241,6 +277,8 @@ if __name__ == "__main__":
                                            transform = transforms.Compose([
                                                Rescale((1024, 1024)),
                                                Crop((512, 512), pattern = "Random"),
+                                               Con_Bright(1.5, 0), 
+                                               Sharpen(), 
                                                ToTensor()
                                            ]))
     print("Loading ended")
