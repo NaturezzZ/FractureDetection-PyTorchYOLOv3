@@ -5,8 +5,13 @@ from utils.datasets import resize
 import os
 import pdb
 def horisontal_flip(images, targets):
-    images = torch.flip(images, [-1])
+    images = torch.flip(images, [2])
     targets[:, 2] = 1 - targets[:, 2]
+    return images, targets
+
+def vertical_flip(images, targets):
+    images = torch.flip(images, [1])
+    targets[:, 3] = 1 - targets[:, 3]
     return images, targets
 
 def crop(images, targets):
