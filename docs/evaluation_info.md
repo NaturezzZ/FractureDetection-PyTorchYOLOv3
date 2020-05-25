@@ -29,7 +29,13 @@ pip install pycocotools
 
 如果遇到报错，见 https://blog.csdn.net/u010103202/article/details/87905029
 
+linux:
 
+pip install Cython
+
+pip install pycocotools
+
+pip install scikit-image
 
 2) 运行 test.py，查看是否有遇到报错
 
