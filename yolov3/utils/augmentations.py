@@ -4,6 +4,9 @@ import numpy as np
 from utils.datasets import resize
 import os
 import pdb
+import cv2
+
+
 def horisontal_flip(images, targets):
     images = torch.flip(images, [2])
     targets[:, 2] = 1 - targets[:, 2]
@@ -67,4 +70,28 @@ def crop(images, targets):
     #print(np.shape(images))
     #print(np.shape(targets))
     #print(targets.dtype)
+    return images, targets
+
+def Con_Bright(images, targets):
+    """
+    调整样本图像的对比度、亮度
+    """
+    images_np = images.numpy()
+    images_np = cv2.convertScaleAbs(images_np * 255, alpha=1.5, beta=-1)
+    images = torch.from_numpy(images_np)
+
+    return images, targets
+
+
+def Sharpen(images, targets):
+    """
+    卷积锐化图像
+    """
+    kernel = np.array([[-1,-1,-1],
+                        [-1, 9,-1],
+                        [-1,-1,-1]])
+    images_np = images.numpy()
+    images_np = cv2.filter2D(images_np, -1, kernel)
+    images = torch.from_numpy(images_np)
+
     return images, targets
