@@ -20,10 +20,12 @@ def vertical_flip(images, targets):
 def crop(images, targets):
     #print(images)
     #print(targets)
-    x = targets[0, 2]
-    y = targets[0, 3]
-    w = targets[0, 4]
-    h = targets[0, 5]
+    max_row, max_col = targets.shape
+    i = np.random.randint(max_row)
+    x = targets[i, 2]
+    y = targets[i, 3]
+    w = targets[i, 4]
+    h = targets[i, 5]
     #print((x,y,w,h))
     _, h_factor, w_factor = images.shape
     
@@ -66,11 +68,7 @@ def crop(images, targets):
     result_tar = torch.from_numpy(result_tar)
 
     targets = result_tar
-    #print('*******')
-    #print(np.shape(images))
-    #print(np.shape(targets))
-    #print(targets.dtype)
-    #print(images)
+    
     return images, targets
 
 def Con_Bright(images, targets):
@@ -79,6 +77,7 @@ def Con_Bright(images, targets):
     """
     images_np = images.numpy()
     images_np = cv2.convertScaleAbs(images_np * 255, alpha=1.5, beta=-1)
+    images_np = images_np / 255
     images = torch.from_numpy(images_np)
 
     return images, targets
@@ -88,35 +87,39 @@ def Sharpen(images, targets):
     """
     卷积锐化图像
     """
-    kernel = np.array([[-1,-1,-1],
-                        [-1, 9,-1],
-                        [-1,-1,-1]])
-    images_np = images.numpy()
-    images_np = cv2.filter2D(images_np, -1, kernel)
-    images = torch.from_numpy(images_np)
-
-    return images, targets
-
-def Con_Bright(images, targets):
-    """
-    调整样本图像的对比度、亮度
-    """
-    images_np = images.numpy()
-    images_np = cv2.convertScaleAbs(images_np * 255, alpha=1.5, beta=-1)
-    images = torch.from_numpy(images_np)
-
-    return images, targets
-
-
-def Sharpen(images, targets):
-    """
-    卷积锐化图像
-    """
-    kernel = np.array([[-1,-1,-1],
-                        [-1, 9,-1],
-                        [-1,-1,-1]])
-    images_np = images.numpy()
-    images_np = cv2.filter2D(images_np, -1, kernel)
-    images = torch.from_numpy(images_np)
+    kernel = np.array([
+        [[[-1,-1,-1],
+        [-1, 9,-1],
+        [-1,-1,-1]],
+        [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+        [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]]],
+        [[[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+        [[-1,-1,-1],
+        [-1, 9,-1],
+        [-1,-1,-1]],
+        [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]]],
+        [[[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+        [[0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]],
+        [[-1,-1,-1],
+        [-1, 9,-1],
+        [-1,-1,-1]]]
+    ])
+    kernel = kernel.astype(np.float64)
+    kernel = torch.from_numpy(kernel)
+    images = images.unsqueeze(0)
+    images = F.conv2d(images, kernel, stride=1, padding=0)
+    images = images.squeeze(0)
 
     return images, targets

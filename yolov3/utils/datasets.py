@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 import torch
 import torch.nn.functional as F
+import cv2
 
 def resize(image, size):
     image = F.interpolate(image.unsqueeze(0), size=size, mode="nearest").squeeze(0)
@@ -14,6 +15,8 @@ def resize(image, size):
 from utils.augmentations import horisontal_flip
 from utils.augmentations import vertical_flip
 from utils.augmentations import crop
+from utils.augmentations import Con_Bright
+from utils.augmentations import Sharpen
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
@@ -51,20 +54,12 @@ class ImageFolder(Dataset):
         img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
         
         #print(img.shape)
-        #print(img)
         # Pad to square resolution
         img, _ = pad_to_square(img, 0)
         # Resize
-        #print(img.shape)
 
         img = resize(img, self.img_size)
-        #print(img.shape)
-        #print(img_path)
-        #print(img)
-        #result_img = torch.zeros((3,1024,1024))
-        #result_img[0,:,:] = img[0,:,:]
-        #result_img[1,:,:] = img[0,:,:]
-        #result_img[2,:,:] = img[0,:,:]
+        
         return img_path, img
 
     def __len__(self):
@@ -72,7 +67,7 @@ class ImageFolder(Dataset):
 
 
 class ListDataset(Dataset):
-    def __init__(self, list_path, img_size=1024, augment=True, multiscale=True, normalized_labels=True, crop_prob=True):
+    def __init__(self, list_path, img_size=1024, augment=True, multiscale=False, normalized_labels=True, crop_prob=0):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
         
@@ -86,8 +81,8 @@ class ListDataset(Dataset):
         self.multiscale = multiscale
         self.crop_prob = crop_prob
         self.normalized_labels = normalized_labels
-        self.min_size = self.img_size - 3 * 32
-        self.max_size = self.img_size + 3 * 32
+        self.min_size = self.img_size - 3 * 64
+        self.max_size = self.img_size + 3 * 64
         self.batch_count = 0
 
     def __getitem__(self, index):
@@ -103,6 +98,8 @@ class ListDataset(Dataset):
         #print(img-transforms.ToTensor()(Image.open(img_path)))
         # Handle images with less than three channels
         
+
+
         if len(img.shape) != 3:
             img = img.unsqueeze(0)
             img = img.expand((3, img.shape[1:]))
@@ -148,12 +145,25 @@ class ListDataset(Dataset):
         else:
             print('open failed '+label_path)
         # Apply augmentations
-        
+
         if np.random.uniform() < self.crop_prob:
             img, targets = crop(img, targets)
         
-        targets = targets.type(torch.FloatTensor)
+        img = resize(img, self.img_size)
+        
+        img, targets = Con_Bright(img, targets)
+        
+        img, targets = Sharpen(img, targets)
 
+        targets = targets.type(torch.FloatTensor)
+        img = img.type(torch.FloatTensor)
+        '''
+        picture = img.numpy()
+        picture= picture*255
+        picture = picture.transpose((1,2,0))
+        print(np.shape(picture))
+        cv2.imwrite(str(index)+'.png', picture)
+        '''
         if self.augment:
             if np.random.random() < 0.5:
                 img, targets = horisontal_flip(img, targets)

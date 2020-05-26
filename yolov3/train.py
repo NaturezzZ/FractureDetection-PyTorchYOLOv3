@@ -42,13 +42,13 @@ if __name__ == "__main__":
     parser.add_argument("--model_def", type=str, default="config/yolov3-custom.cfg", help="path to model definition file")
     parser.add_argument("--data_config", type=str, default="config/custom.data", help="path to data config file")
     parser.add_argument("--pretrained_weights", type=str, default = "checkpoints/yolov3_ckpt_final.pth", help="if specified starts from checkpoint model")
-    parser.add_argument("--n_cpu", type=int, default=12, help="number of cpu threads to use during batch generation")
+    parser.add_argument("--n_cpu", type=int, default=14, help="number of cpu threads to use during batch generation")
     parser.add_argument("--img_size", type=int, default=512, help="size of each image dimension")
-    parser.add_argument("--checkpoint_interval", type=int, default=20, help="interval between saving model weights")
-    parser.add_argument("--evaluation_interval", type=int, default=2, help="interval evaluations on validation set")
+    parser.add_argument("--checkpoint_interval", type=int, default=10, help="interval between saving model weights")
+    parser.add_argument("--evaluation_interval", type=int, default=5, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=True, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=False, help="allow for multi-scale training")
-    parser.add_argument("--crop_probility", type=float, default= 0.5, help = "probility to crop the picture like a microscope")
+    parser.add_argument("--crop_probility", type=float, default= 0, help = "probility to crop the picture like a microscope")
     opt = parser.parse_args()
     print(opt)
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     print('Model {} : params: {:4f}M'.format(model._get_name(), para * 4 / 1000 / 1000))
 
     # Get dataloader
-    dataset = ListDataset(train_path, augment=True, crop_prob=opt.crop_probility, multiscale=opt.multiscale_training)
+    dataset = ListDataset(train_path, img_size = opt.img_size, augment=True, crop_prob=opt.crop_probility, multiscale=opt.multiscale_training)
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=opt.batch_size,
@@ -165,6 +165,33 @@ if __name__ == "__main__":
             model.seen += imgs.size(0)
 
         if epoch % opt.evaluation_interval == 1:
+
+            print("\n---- Evaluating On Training Set ----")
+            # Evaluate the model on the validation set
+            precision, recall, AP, f1, ap_class = evaluate(
+                model,
+                path=train_path,
+                iou_thres=0.5,
+                conf_thres=0.5,
+                nms_thres=0.5,
+                img_size=opt.img_size,
+                batch_size=2,
+            )
+            evaluation_metrics = [
+                ("val_precision", precision.mean()),
+                ("val_recall", recall.mean()),
+                ("val_mAP", AP.mean()),
+                ("val_f1", f1.mean()),
+            ]
+            logger.list_of_scalars_summary(evaluation_metrics, epoch)
+
+            # Print class APs and mAP
+            ap_table = [["Index", "Class name", "AP"]]
+            for i, c in enumerate(ap_class):
+                ap_table += [[c, class_names[c], "%.5f" % AP[i]]]
+            print(AsciiTable(ap_table).table)
+            print(f"---- mAP {AP.mean()}")
+
             print("\n---- Evaluating Model ----")
             # Evaluate the model on the validation set
             precision, recall, AP, f1, ap_class = evaluate(
@@ -174,7 +201,7 @@ if __name__ == "__main__":
                 conf_thres=0.5,
                 nms_thres=0.5,
                 img_size=opt.img_size,
-                batch_size=8,
+                batch_size=2,
             )
             evaluation_metrics = [
                 ("val_precision", precision.mean()),
