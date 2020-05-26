@@ -52,7 +52,7 @@ def crop(images, targets):
     new_image = images[:, ty1:ty2, tx1:tx2]
     #new_image = images[:, :int(y2_p), :]
     #new_image = new_image[:,:,int(x1_p):int(x2_p)]
-    new_image = resize(new_image, (512,512))
+    new_image = resize(new_image, (1024,1024))
     images = new_image
 
     result_tar = np.zeros((1,6))
@@ -70,6 +70,31 @@ def crop(images, targets):
     #print(np.shape(images))
     #print(np.shape(targets))
     #print(targets.dtype)
+    #print(images)
+    return images, targets
+
+def Con_Bright(images, targets):
+    """
+    调整样本图像的对比度、亮度
+    """
+    images_np = images.numpy()
+    images_np = cv2.convertScaleAbs(images_np * 255, alpha=1.5, beta=-1)
+    images = torch.from_numpy(images_np)
+
+    return images, targets
+
+
+def Sharpen(images, targets):
+    """
+    卷积锐化图像
+    """
+    kernel = np.array([[-1,-1,-1],
+                        [-1, 9,-1],
+                        [-1,-1,-1]])
+    images_np = images.numpy()
+    images_np = cv2.filter2D(images_np, -1, kernel)
+    images = torch.from_numpy(images_np)
+
     return images, targets
 
 def Con_Bright(images, targets):

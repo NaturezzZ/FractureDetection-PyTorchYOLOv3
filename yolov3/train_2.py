@@ -1,3 +1,6 @@
+# python train.py --pretrained_weights checkpoints/yolov3_ckpt_final.pth --epochs 20
+# python train2.py --pretrained_weights checkpoints/yolov3_ckpt_final.pth --epochs 20
+
 from __future__ import division
 
 from models import *
@@ -5,7 +8,8 @@ from utils.logger import *
 from utils.utils import *
 from utils.datasets import *
 from utils.parse_config import *
-from test import evaluate
+from test_2 import evaluate
+from AP50test import AP50_standard_test
 
 from terminaltables import AsciiTable
 
@@ -38,17 +42,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=100, help="number of epochs")
     parser.add_argument("--batch_size", type=int, default=8, help="size of each image batch")
-    parser.add_argument("--gradient_accumulations", type=int, default=8, help="number of gradient accums before step")
+    parser.add_argument("--gradient_accumulations", type=int, default=2, help="number of gradient accums before step")
     parser.add_argument("--model_def", type=str, default="config/yolov3-custom.cfg", help="path to model definition file")
     parser.add_argument("--data_config", type=str, default="config/custom.data", help="path to data config file")
     parser.add_argument("--pretrained_weights", type=str, default = "checkpoints/yolov3_ckpt_final.pth", help="if specified starts from checkpoint model")
     parser.add_argument("--n_cpu", type=int, default=12, help="number of cpu threads to use during batch generation")
     parser.add_argument("--img_size", type=int, default=512, help="size of each image dimension")
-    parser.add_argument("--checkpoint_interval", type=int, default=20, help="interval between saving model weights")
+    parser.add_argument("--checkpoint_interval", type=int, default=5, help="interval between saving model weights")
     parser.add_argument("--evaluation_interval", type=int, default=2, help="interval evaluations on validation set")
     parser.add_argument("--compute_map", default=True, help="if True computes mAP every tenth batch")
     parser.add_argument("--multiscale_training", default=False, help="allow for multi-scale training")
     parser.add_argument("--crop_probility", type=float, default= 0.5, help = "probility to crop the picture like a microscope")
+    parser.add_argument("--run_final_test", default=True, help = "to run the final test (with standard AP50 api)")
     opt = parser.parse_args()
     print(opt)
 
@@ -122,7 +127,7 @@ if __name__ == "__main__":
             loss, outputs = model(imgs, targets)
             loss.backward()
 
-            if (batches_done+1) % opt.gradient_accumulations==0:
+            if batches_done % opt.gradient_accumulations:
                 # Accumulates gradient before each step
                 optimizer.step()
                 optimizer.zero_grad()
@@ -194,3 +199,19 @@ if __name__ == "__main__":
         if epoch % opt.checkpoint_interval == 0:
             torch.save(model.state_dict(), f"checkpoints/yolov3_ckpt_%d.pth" % (epoch+1))
     torch.save(model.state_dict(), "checkpoints/yolov3_ckpt_final.pth")
+    
+    # run test model with output_json = True to get the json file
+    evaluate(
+        model,
+        path=valid_path,
+        iou_thres=0.5,
+        conf_thres=0.5,
+        nms_thres=0.5,
+        img_size=opt.img_size,
+        batch_size=8,
+        output_json = True
+    )
+    # run AP50 standard test required by proj_4_problem
+    # using the json file above and the ground truth
+    AP50_standard_test()
+    

@@ -12,3 +12,4 @@ weights/*.weights
 __pycache__
 checkpoints
 data/custom/images1
+data/json_origin/*.json

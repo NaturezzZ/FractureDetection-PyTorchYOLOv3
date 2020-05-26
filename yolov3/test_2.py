@@ -11,6 +11,9 @@ import time
 import datetime
 import argparse
 import tqdm
+import re
+import json
+from AP50test import AP50_standard_test
 
 import torch
 from torch.utils.data import DataLoader
@@ -20,7 +23,7 @@ from torch.autograd import Variable
 import torch.optim as optim
 
 
-def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size):
+def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size, output_json = False):
     model.eval()
 
     # Get dataloader
@@ -33,6 +36,7 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
 
     labels = []
     sample_metrics = []  # List of tuples (TP, confs, pred)
+    json_out = []
     for batch_i, (_, imgs, targets) in enumerate(tqdm.tqdm(dataloader, desc="Detecting objects")):
         #print(batch_i, (_, imgs, targets))
         # Extract labels
@@ -46,8 +50,43 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
         with torch.no_grad():
             outputs = model(imgs)
             outputs = non_max_suppression(outputs, conf_thres=conf_thres, nms_thres=nms_thres)
+            # print("***************")
+            # print(outputs)
+            if output_json:
+                # open txt file to get image_id for each image
+                with open(path, "r") as file:
+                    img_files = file.readlines()
+                Id = []
+                for i in range(len(img_files)):
+                    Id.append(int(re.findall(r'\d+', img_files[i])[0]))
+                # print (Id)
+
+                for frac_i in range(len(outputs)):
+                    if outputs[frac_i] == None:
+                        continue
+                    sz = outputs[frac_i].size(0)
+                    image_fraction_list = outputs[frac_i].numpy().tolist()
+                    # print("******************")
+                    # print(image_fraction_list)
+                    for i in range(sz):
+
+                        frac_dict = {}
+                        
+                        row = batch_i * batch_size + frac_i
+                        frac_dict["image_id"] = Id[row]
+                        frac_dict["category_id"] = 1 # for all fractions in this task category_id = 1
+                        x1 = image_fraction_list[i][0]
+                        y1 = image_fraction_list[i][1]
+                        x2 = image_fraction_list[i][2]
+                        y2 = image_fraction_list[i][3]
+                        frac_dict["bbox"] = [x1, y1, x2 - x1, y2 - y1]
+                        frac_dict["score"] = image_fraction_list[i][4]
+                        json_out.append(frac_dict)
 
         sample_metrics += get_batch_statistics(outputs, targets, iou_threshold=iou_thres)
+    if output_json:
+        with open('./data/json_origin/out.json', "w") as f:
+            json.dump(json_out, f, indent=4)
     if len(sample_metrics) == 0:
         return np.array([0]), np.array([0]), np.array([0]), np.array([0]), np.array([0], dtype=np.int)
     # Concatenate sample statistics
@@ -65,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--weights_path", type=str, default="checkpoints/yolov3_ckpt_final.pth", help="path to weights file")
     parser.add_argument("--class_path", type=str, default="data/custom/classes.names", help="path to class label file")
     parser.add_argument("--iou_thres", type=float, default=0.5, help="iou threshold required to qualify as detected")
-    parser.add_argument("--conf_thres", type=float, default=0.9, help="object confidence threshold")
+    parser.add_argument("--conf_thres", type=float, default=0.1, help="object confidence threshold")
     parser.add_argument("--nms_thres", type=float, default=0.5, help="iou thresshold for non-maximum suppression")
     parser.add_argument("--n_cpu", type=int, default=12, help="number of cpu threads to use during batch generation")
     parser.add_argument("--img_size", type=int, default=512, help="size of each image dimension")
@@ -97,6 +136,7 @@ if __name__ == "__main__":
         nms_thres=opt.nms_thres,
         img_size=opt.img_size,
         batch_size=8,
+        output_json=True
     )
 
     print("Average Precisions:")
@@ -105,20 +145,25 @@ if __name__ == "__main__":
 
     print(f"mAP: {AP.mean()}")
 
-    print("Compute mAP...")
+    AP50_standard_test()
 
-    precision, recall, AP, f1, ap_class = evaluate(
-        model,
-        path=valid_path,
-        iou_thres=opt.iou_thres,
-        conf_thres=opt.conf_thres,
-        nms_thres=opt.nms_thres,
-        img_size=opt.img_size,
-        batch_size=8,
-    )
+    # print("Compute mAP...")
 
-    print("Average Precisions:")
-    for i, c in enumerate(ap_class):
-        print(f"+ Class '{c}' ({class_names[c]}) - AP: {AP[i]}")
+    # precision, recall, AP, f1, ap_class = evaluate(
+    #     model,
+    #     path=valid_path,
+    #     iou_thres=opt.iou_thres,
+    #     conf_thres=opt.conf_thres,
+    #     nms_thres=opt.nms_thres,
+    #     img_size=opt.img_size,
+    #     batch_size=8,
+    #     output_json=True
+    # )
 
-    print(f"mAP: {AP.mean()}")
+    # print("Average Precisions:")
+    # for i, c in enumerate(ap_class):
+    #     print(f"+ Class '{c}' ({class_names[c]}) - AP: {AP[i]}")
+
+    # print(f"mAP: {AP.mean()}")
+
+    # AP50_standard_test()

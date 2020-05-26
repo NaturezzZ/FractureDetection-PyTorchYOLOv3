@@ -41,19 +41,30 @@ def random_resize(images, min_size=288, max_size=448):
 
 
 class ImageFolder(Dataset):
-    def __init__(self, folder_path, img_size=512):
+    def __init__(self, folder_path, img_size=1024):
         self.files = sorted(glob.glob("%s/*.*" % folder_path))
         self.img_size = img_size
 
     def __getitem__(self, index):
         img_path = self.files[index % len(self.files)]
         # Extract image as PyTorch tensor
-        img = transforms.ToTensor()(Image.open(img_path))
+        img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
+        
+        #print(img.shape)
+        #print(img)
         # Pad to square resolution
         img, _ = pad_to_square(img, 0)
         # Resize
-        img = resize(img, self.img_size)
+        #print(img.shape)
 
+        img = resize(img, self.img_size)
+        #print(img.shape)
+        #print(img_path)
+        #print(img)
+        #result_img = torch.zeros((3,1024,1024))
+        #result_img[0,:,:] = img[0,:,:]
+        #result_img[1,:,:] = img[0,:,:]
+        #result_img[2,:,:] = img[0,:,:]
         return img_path, img
 
     def __len__(self):
@@ -61,7 +72,7 @@ class ImageFolder(Dataset):
 
 
 class ListDataset(Dataset):
-    def __init__(self, list_path, img_size=512, augment=True, multiscale=True, normalized_labels=True, crop_prob=True):
+    def __init__(self, list_path, img_size=1024, augment=True, multiscale=True, normalized_labels=True, crop_prob=True):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
         
@@ -89,8 +100,9 @@ class ListDataset(Dataset):
 
         # Extract image as PyTorch tensor
         img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
-
+        #print(img-transforms.ToTensor()(Image.open(img_path)))
         # Handle images with less than three channels
+        
         if len(img.shape) != 3:
             img = img.unsqueeze(0)
             img = img.expand((3, img.shape[1:]))
@@ -109,6 +121,7 @@ class ListDataset(Dataset):
 
         targets = None
         if os.path.exists(label_path):
+            #print('successfully opened '+label_path)
             boxes = np.loadtxt(label_path).reshape(-1, 5)
             boxes.astype(np.double)
             #print(np.loadtxt(label_path).reshape(-1, 5).dtype)
@@ -132,10 +145,13 @@ class ListDataset(Dataset):
 
             targets = torch.zeros((len(boxes), 6))
             targets[:, 1:] = boxes
+        else:
+            print('open failed '+label_path)
         # Apply augmentations
         
         if np.random.uniform() < self.crop_prob:
             img, targets = crop(img, targets)
+        
         targets = targets.type(torch.FloatTensor)
 
         if self.augment:
