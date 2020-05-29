@@ -27,12 +27,14 @@ def pad_to_square(img, pad_value):
     # (upper / left) padding and (lower / right) padding
     pad1, pad2 = dim_diff // 2, dim_diff - dim_diff // 2
     # Determine padding
+    # left, right, up, down
+    # https://blog.csdn.net/sinat_36618660/article/details/100122745
     pad = (0, 0, pad1, pad2) if h <= w else (pad1, pad2, 0, 0)
+    pad = (0, 0, 0, 0)
     # Add padding
     img = F.pad(img, pad, "constant", value=pad_value)
 
     return img, pad
-
 
 
 
@@ -52,14 +54,18 @@ class ImageFolder(Dataset):
         img_path = self.files[index % len(self.files)]
         # Extract image as PyTorch tensor
         img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
-        
-        #print(img.shape)
+        # https://blog.csdn.net/qq_37385726/article/details/81771980
+
+        # print(img.shape)
         # Pad to square resolution
         img, _ = pad_to_square(img, 0)
         # Resize
 
         img = resize(img, self.img_size)
         
+        img, targets = Con_Bright(img, torch.tensor((1,6)))
+        
+        img, targets = Sharpen(img, targets)
         return img_path, img
 
     def __len__(self):
@@ -67,7 +73,7 @@ class ImageFolder(Dataset):
 
 
 class ListDataset(Dataset):
-    def __init__(self, list_path, img_size=1024, augment=True, multiscale=False, normalized_labels=True, crop_prob=0):
+    def __init__(self, list_path, img_size=1024, augment=True, multiscale=False, normalized_labels=True, crop_prob=0, final_test = False):
         with open(list_path, "r") as file:
             self.img_files = file.readlines()
         
@@ -84,6 +90,21 @@ class ListDataset(Dataset):
         self.min_size = self.img_size - 3 * 64
         self.max_size = self.img_size + 3 * 64
         self.batch_count = 0
+        
+        if final_test:
+            print ("Loading images' size...")
+            self.image_w = []
+            self.image_h = []
+            for index in range(len(self.img_files)):
+                img_path = self.img_files[index].rstrip()
+                img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
+                if len(img.shape) != 3:
+                    img = img.unsqueeze(0)
+                    img = img.expand((3, img.shape[1:]))
+                _, h, w = img.shape
+                self.image_w.append(w)
+                self.image_h.append(h)
+            print ("Load ended.")
 
     def __getitem__(self, index):
 
@@ -95,7 +116,7 @@ class ListDataset(Dataset):
 
         # Extract image as PyTorch tensor
         img = transforms.ToTensor()(Image.open(img_path).convert('RGB'))
-        #print(img-transforms.ToTensor()(Image.open(img_path)))
+        # print(img-transforms.ToTensor()(Image.open(img_path)))
         # Handle images with less than three channels
         
 
@@ -132,8 +153,8 @@ class ListDataset(Dataset):
             # Adjust for added padding
             x1 += pad[0]
             y1 += pad[2]
-            x2 += pad[1]
-            y2 += pad[3]
+            x2 += pad[0] # warning: changed by yhx; may be wrong!
+            y2 += pad[2] # warning: changed by yhx; may be wrong!
             # Returns (x, y, w, h)
             boxes[:, 1] = ((x1 + x2) / 2) / padded_w
             boxes[:, 2] = ((y1 + y2) / 2) / padded_h
