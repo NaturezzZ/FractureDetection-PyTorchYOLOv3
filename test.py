@@ -111,7 +111,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_config", type=str, default="config/custom.data", help="path to data config file")
     parser.add_argument("--class_path", type=str, default="data/custom/classes.names", help="path to class label file")
     parser.add_argument("--iou_thres", type=float, default=0.5, help="iou threshold required to qualify as detected")
-    parser.add_argument("--conf_thres", type=float, default=0.5, help="object confidence threshold")
+    parser.add_argument("--conf_thres", type=float, default=0.001, help="object confidence threshold")
     parser.add_argument("--nms_thres", type=float, default=0.5, help="iou thresshold for non-maximum suppression")
     parser.add_argument("--n_cpu", type=int, default=14, help="number of cpu threads to use during batch generation")
     parser.add_argument("--img_size", type=int, default=1024, help="size of each image dimension")
