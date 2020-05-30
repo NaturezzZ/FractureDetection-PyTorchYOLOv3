@@ -20,3 +20,4 @@ retraining_nocrop
 
 data/json_origin/*.json
 data/data_preparation/*.txt
+tiny_checkpoints
