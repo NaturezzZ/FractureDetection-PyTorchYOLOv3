@@ -24,7 +24,7 @@ import torch.optim as optim
 from AP50test import AP50_standard_test
 
 
-def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size, final_test = False):
+def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size, final_test = False, output_path = './data/json_origin/out.json'):
     model.eval()
 
     # Get dataloader
@@ -93,7 +93,8 @@ def evaluate(model, path, iou_thres, conf_thres, nms_thres, img_size, batch_size
 
         sample_metrics += get_batch_statistics(outputs, targets, iou_threshold=iou_thres)
     if final_test:
-        with open('./data/json_origin/out.json', "w") as f:
+        #with open('./data/json_origin/out.json', "w") as f:
+        with open(output_path, "w") as f:
             json.dump(json_out, f, indent=4)
     if len(sample_metrics) == 0:
         return np.array([0]), np.array([0]), np.array([0]), np.array([0]), np.array([0], dtype=np.int)
@@ -167,7 +168,7 @@ if __name__ == "__main__":
         h /= img_h
         # append data
         with open(opt.data_dir + '/' + str(img_id) + ".txt", "a") as f:
-            s = str(0) + ' ' + str(xmid) + ' ' + str(ymid) + ' ' + str(w) + ' ' + str(h)
+            s = str(0) + ' ' + str(xmid) + ' ' + str(ymid) + ' ' + str(w) + ' ' + str(h) + '\n'
             f.write(s)
 
     # load classes_names
@@ -193,15 +194,17 @@ if __name__ == "__main__":
         nms_thres=opt.nms_thres,
         img_size=opt.img_size,
         batch_size=opt.batch_size,
-        final_test=True
+        final_test=True,
+        output_path=opt.output_path
     )
     
     # AP (provided by YOLOV3 default)
+    '''
     print("Average Precisions:")
     for i, c in enumerate(ap_class):
         print(f"+ Class '{c}' ({class_names[c]}) - AP: {AP[i]}")
 
     print(f"mAP: {AP.mean()}")
-    
+    '''
     # AP (provided by the project)
     AP50_standard_test(opt.anno_path, opt.output_path, img_num)
