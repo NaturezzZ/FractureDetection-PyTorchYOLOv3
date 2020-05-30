@@ -168,8 +168,8 @@ if __name__ == "__main__":
 
             model.seen += imgs.size(0)
 
-        if epoch % opt.evaluation_interval == 1:
-
+        if epoch % opt.evaluation_interval == 0:
+            '''
             print("\n---- Evaluating On Training Set ----")
             # Evaluate the model on the validation set
             precision, recall, AP, f1, ap_class = evaluate(
@@ -197,8 +197,9 @@ if __name__ == "__main__":
                 print(f"+ Class '{c}' ({class_names[c]}) - Recall50: {recall[i]}")
             #print(AsciiTable(ap_table).table)
             print(f"---- mAP {AP.mean()}")
-
+            '''
             print("\n---- Evaluating Model ----")
+            print(opt.pretrained_weights)
             # Evaluate the model on the validation set
             precision, recall, AP, f1, ap_class = evaluate(
                 model,
@@ -226,7 +227,7 @@ if __name__ == "__main__":
             #print(AsciiTable(ap_table).table)
             print(f"---- mAP {AP.mean()}")
             if AP.mean()>0.05:
-                torch.save(model.state_dict(), opt.checkpoints_dir + f"/good_%.4f_ckpt_%d.pth" % (AP.mean(), epoch))
-        if epoch % opt.checkpoint_interval == 1:
-            torch.save(model.state_dict(), opt.checkpoints_dir + f"/yolov3_ckpt_%d.pth" % (epoch))
+                torch.save(model.state_dict(), opt.checkpoints_dir + f"/good_%.5f_ckpt_%d.pth" % (AP.mean(), epoch))
+        #if epoch % opt.checkpoint_interval == 1:
+            #torch.save(model.state_dict(), opt.checkpoints_dir + f"/yolov3_ckpt_%d.pth" % (epoch))
     torch.save(model.state_dict(), opt.checkpoints_dir+"/yolov3_ckpt_final.pth")
