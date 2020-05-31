@@ -41,7 +41,7 @@ python test.py --data_dir /path/to/fracture/test \
 
 2. Our evaluation is computed with `AP50` metrics.
 
-3. With default setting of batch size (batch_size=2), test.py consumes no more than 5G GPU Memory, and you can set batch_size=1 when GPU memory is insufficient.
+3. With default setting of batch size (batch_size=2), test.py consumes no more than 4GB GPU Memory, and you can set batch_size=1 when GPU memory is insufficient.
 
 4. You can change other parameters.
 
@@ -59,7 +59,7 @@ You should use data/data_preparation/change_data.py to convert data from COCO fo
 ```
 python train.py --pretrained_weights /path/to/pretrained/weights \
                 --epochs 100 \
-                --data_config config/custom.data\
+                --data_config config/custom.data
 ```
 
 You can refer to [PyTorch-YOLOv3](https://github.com/NaturezzZ/FractureDetection/blob/master/yolo_README.md) for more information.
