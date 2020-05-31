@@ -22,7 +22,7 @@ $ sudo pip3 install -r requirements.txt
 
 ##### Model Downloading
 
-You can download our weights from [Peking University Cloud]() or [OneDrive Cloud]().
+You can download our weights from [Peking University Cloud](https://disk.pku.edu.cn:443/link/4E0333B716CB2D7124ECFFA3624BEF3E) or [OneDrive Cloud](https://pkueducn-my.sharepoint.com/:u:/g/personal/zhengnaiqian_pku_edu_cn/EQPrYihpdNJOncFh7itykQYBw8knjsXMiyDT6t_NO5_DXg?e=hMaa8d), or you can download this file [directly](http://pub1806cloud.zhengnq.top:18060/index.php/s/jSNDWbPd2a4F5pL).
 
 ##### Requirements
 
