@@ -6,7 +6,9 @@ build
 dist
 .vscode
 output
-output_withbox
+output_withbox_dpi200
+output_withbox_dpi400
+output_withbox_dpi600
 
 data/samples
 backup

@@ -23,7 +23,7 @@ if __name__ == "__main__":
     img_dir = './data/custom/images/'
     ground_truth_json_dir = './data/json_origin/anno_val.json'
     prediction_json_dir = './data/json_origin/out.json'
-    save_dir = './output_withbox/'
+    save_dir = './output_withbox_dpi600/'
 
     with open(ground_truth_json_dir, "r") as f:
         val = json.load(f)
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         img_pos = img_dir + images_info[img_i]["file_name"]
         img_numpy = cv2.imread(img_pos)
         # show image
-        # plt.figure(figsize=(15, 15))
+        plt.figure()
         plt.imshow(img_numpy)
         # load ground truth
         ground_truth_cnt = 0
@@ -54,7 +54,8 @@ if __name__ == "__main__":
             if prediction[frac_i]["image_id"] == img_id:
                 show_box(prediction[frac_i]["bbox"], color = 'g')
                 prediction_cnt = prediction_cnt + 1
-        print ("ground truth cnt %d, prediction cnt %d" % (ground_truth_cnt, prediction_cnt))
+        print ("%d.jpg: ground truth cnt %d, prediction cnt %d" % (img_id, ground_truth_cnt, prediction_cnt))
         # save image and print
         plt.axis('off')
-        plt.savefig(save_dir + str(img_id) + '_ground_truth_and_prediction.jpg', dpi = 800)
+        plt.savefig(save_dir + str(img_id) + '_ground_truth_and_prediction.jpg', dpi = 600)
+        plt.close()
