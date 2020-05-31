@@ -6,6 +6,7 @@ build
 dist
 .vscode
 output
+output_withbox
 
 data/samples
 backup
