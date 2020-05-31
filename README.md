@@ -74,7 +74,7 @@ python test.py --data_dir /path/to/fracture/test \
 
 ##### Train the network
 
-You should use data/data_preparation/change_data.py to convert data from COCO format to yolov3 format. Move your annotations to data/custom/labels/. The dataloader expects that the annotation file corresponding to the image data/custom/images/train.jpg has the path data/custom/labels/train.txt. Each row in the annotation file should define one bounding box, using the syntax label_idx x_center y_center width height. The coordinates should be scaled [0, 1], and the label_idx should be zero-indexed and correspond to the row number of the class name in data/custom/classes.names.
+You should use `data/data_preparation/change_data.py` to convert data from COCO format to yolov3 format. Move your annotations to `data/custom/labels/`. The dataloader expects that the annotation file corresponding to the image `data/custom/images/train.jpg` has the path `data/custom/labels/train.txt`. Each row in the annotation file should define one bounding box, using the syntax `label_idx x_center y_center width height`. The coordinates should be scaled [0, 1], and the label_idx should be zero-indexed and correspond to the row number of the class name in `data/custom/classes.names`.
 ```
 python train.py --pretrained_weights /path/to/pretrained/weights \
                 --epochs 100 \
