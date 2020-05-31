@@ -205,6 +205,34 @@ if __name__ == "__main__":
                 model,
                 path=valid_path,
                 iou_thres=0.5,
+                conf_thres=0.1,
+                nms_thres=0.1,
+                img_size=opt.img_size,
+                batch_size=opt.batch_size
+            )
+            evaluation_metrics = [
+                ("val_precision", precision.mean()),
+                ("val_recall", recall.mean()),
+                ("val_mAP", AP.mean()),
+                ("val_f1", f1.mean()),
+            ]
+            logger.list_of_scalars_summary(evaluation_metrics, epoch)
+
+            # Print class APs and mAP
+            ap_table = [["Index", "Class name", "AP"]]
+            for i, c in enumerate(ap_class):
+                #ap_table += [[c, class_names[c], "%.5f" % AP[i]]]
+                print(f"+ Class '{c}' ({class_names[c]}) - Precision50: {precision[i]}")
+                print(f"+ Class '{c}' ({class_names[c]}) - Recall50: {recall[i]}")
+            #print(AsciiTable(ap_table).table)
+            print(f"---- mAP {AP.mean()}")
+            if AP.mean()>0.07:
+                torch.save(model.state_dict(), opt.checkpoints_dir + f"/conf_0.1_good_%.5f_ckpt_%d.pth" % (AP.mean(), epoch))
+            
+            precision, recall, AP, f1, ap_class = evaluate(
+                model,
+                path=valid_path,
+                iou_thres=0.5,
                 conf_thres=0.001,
                 nms_thres=0.5,
                 img_size=opt.img_size,
