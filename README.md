@@ -10,12 +10,12 @@ Medical imaging is an essential technique widely used for medical diagnostics. H
 
 We trained our model on Ubuntu Server 16.04 LTS with NVIDIA RTX2070 Super 8G GPU, AMD 3700X and 32G Memory.  
 
-We used part of the code from [PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3) and open sourced our project based on [GNU General Public License v3.0](https://raw.githubusercontent.com/NaturezzZ/FractureDetection/master/LICENSE).
+We used part of the code from [PyTorch-YOLOv3](https://github.com/eriklindernoren/PyTorch-YOLOv3) and open sourced our project based on [GNU General Public License v3.0](https://raw.githubusercontent.com/NaturezzZ/FractureDetection-PyTorchYOLOv3/master/LICENSE).
 
 ## Installation
 
 ```
-$ git clone https://github.com/NaturezzZ/FractureDetection.git
+$ git clone https://github.com/NaturezzZ/FractureDetection-PyTorchYOLOv3.git
 $ cd FractureDetection/
 $ sudo pip3 install -r requirements.txt
 ```
@@ -81,7 +81,7 @@ python train.py --pretrained_weights /path/to/pretrained/weights \
                 --data_config config/custom.data
 ```
 
-You can refer to [PyTorch-YOLOv3](https://github.com/NaturezzZ/FractureDetection/blob/master/yolo_README.md) for more information.
+You can refer to [PyTorch-YOLOv3](https://github.com/NaturezzZ/FractureDetection-PyTorchYOLOv3/blob/master/yolo_README.md) for more information.
 
 ## Maintainers
 
