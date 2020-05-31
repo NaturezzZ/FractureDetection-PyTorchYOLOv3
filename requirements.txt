@@ -1,4 +1,4 @@
-numpy==1.17
+numpy==1.17 (pip install -U numpy==1.17.0)
 torch>=1.0
 torchvision
 matplotlib
@@ -8,7 +8,8 @@ terminaltables
 pillow
 tqdm
 opencv-python
-cython
+Cython
 pycocotools
+json
 scipy
 scikit_image
