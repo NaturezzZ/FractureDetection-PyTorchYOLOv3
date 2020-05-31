@@ -24,6 +24,25 @@ $ sudo pip3 install -r requirements.txt
 
 You can download our weights from [Peking University Cloud]() or [OneDrive Cloud]().
 
+##### Requirements
+
+```
+numpy==1.17
+torch>=1.0
+torchvision
+matplotlib
+tensorflow
+tensorboard
+terminaltables
+pillow
+tqdm
+opencv-python
+cython
+pycocotools
+scipy
+scikit_image
+```
+
 ## Usage
 
 ##### Test the performance
